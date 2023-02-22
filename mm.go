@@ -26,7 +26,7 @@ func main() {
 	}
 	fmt.Println(antnum)
 
-	rooms := make(map[string]*Room)
+	Rooms := make(map[string]*Room)
 
 	var start, end *Room
 	var name string
@@ -35,6 +35,7 @@ func main() {
 		if strings.HasPrefix(line, "##start") {
 			name := strings.Fields(ting[i+1])
 			start = &Room{name: name[0]}
+
 			continue
 		}
 
@@ -49,22 +50,19 @@ func main() {
 
 		if len(strings.Fields(line)) == 3 {
 			name = strings.Fields(line)[0]
-			rooms[name] = &Room{name: name}
+			Rooms[name] = &Room{name: name}
 		} else {
 			path := strings.Split(line, "-")
 
-			if rooms[path[0]].name == path[0] {
-				rooms[path[0]].links = append(rooms[path[0]].links, &Room{name: path[1]})
+			if Rooms[path[0]].name == path[0] {
+				Rooms[path[0]].links = append(Rooms[path[0]].links, &Room{name: path[1]})
 			}
 		}
 
 	}
-	for start!=nil{
-		
-	}
-
-	// fmt.Println(rooms[name].links)
-	fmt.Println(start.links)
+	start.links = Rooms[start.name].links
+	fmt.Println(Rooms[start.name].links[0])
+	fmt.Println(start.links[0])
 	fmt.Println(end)
-	fmt.Println(rooms["0"].links[0] == nil)
+	// fmt.Println(rooms["0"].links[0] == nil)
 }
