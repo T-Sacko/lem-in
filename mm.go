@@ -32,20 +32,15 @@ func main() {
 	var name string
 
 	for i, line := range ting {
-		// name = strings.Fields(line)[0]
 
 		if strings.HasPrefix(line, "##start") {
-			// fmt.Println(strings.Fields(ting[i+1])[0])
 			name = strings.Fields(ting[i+1])[0]
 			start = &Room{name: name}
 			Rooms[name] = start
-			//	fmt.Println("it's", Rooms["0"].name == start.name)
 
 			continue
 		}
-		if i == 2 {
-			fmt.Println("stilll")
-		}
+
 		if strings.HasPrefix(line, "##end") {
 			name = strings.Fields(ting[i+1])[0]
 			end = &Room{name: name}
@@ -63,16 +58,28 @@ func main() {
 			}
 		} else {
 			path := strings.Split(line, "-")
-			fmt.Println(path[1])
 			if Rooms[path[0]].name == path[0] {
 				Rooms[path[0]].links = append(Rooms[path[0]].links, Rooms[path[1]])
-				fmt.Println(start.links[0])
 			}
 		}
 
 	}
 
-	// fmt.Println(start.links[0])
-	fmt.Println("ingore",end)
-	fmt.Println(start.links)
+	fmt.Println("ignore", end.name)
+	cur := start
+	for cur.links != nil {
+		if cur == start {
+			fmt.Println("start")
+		}
+		fmt.Print(cur.name, "->")
+		if cur == end {
+			fmt.Print("end")
+			break
+		}
+		if cur.links[0].links == nil {
+			fmt.Print(cur.links[0].name)
+		}
+		cur = cur.links[0]
+
+	}
 }
