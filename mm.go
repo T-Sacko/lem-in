@@ -30,6 +30,7 @@ func main() {
 
 	var start, end *Room
 	var name string
+	
 
 	for i, line := range ting {
 
@@ -58,30 +59,26 @@ func main() {
 			if name != start.name {
 				Rooms[name] = &Room{name: name}
 			}
+			
 		} else {
 			path := strings.Split(line, "-")
 			if Rooms[path[0]].name == path[0] {
 				Rooms[path[0]].links = append(Rooms[path[0]].links, Rooms[path[1]])
-				if Rooms[path[1]].name==end.name{
-					end=Rooms[path[1]]
+				if Rooms[path[1]].name == end.name {
+					end = Rooms[path[1]]
 				}
 			}
 		}
 
 	}
 
-	
 	cur := start
-
-	fmt.Printf("start address: %p\n", start)
-	fmt.Printf("Rooms[\"0\"] address: %p\n", Rooms["0"])
-	fmt.Printf("end address: %p\n", end)
-	fmt.Printf("Rooms[\"1\"] address: %p\n", Rooms["1"])
-
+	var Possible bool
 	for cur != nil {
 
 		fmt.Print(cur.name, "->")
-		if Rooms["1"] == end {
+		if cur == end {
+			Possible = true
 			fmt.Print("end")
 			break
 		}
@@ -90,4 +87,43 @@ func main() {
 
 	}
 	fmt.Println()
+	fmt.Println(Possible)
+
+	allPaths := DFSAll(start, end)
+fmt.Println("All possible paths:")
+for _, path := range allPaths {
+    for i, room := range path {
+        fmt.Print(room.name)
+        if i < len(path)-1 {
+            fmt.Print("->")
+        }
+    }
+    fmt.Println()
+}
+	
+}
+func DFSAll(start, end *Room) [][]*Room {
+    visited := make(map[*Room]bool)
+    return dfsHelperAll(start, end, visited)
+}
+
+func dfsHelperAll(curr, end *Room, visited map[*Room]bool) [][]*Room {
+    if curr == end {
+        return [][]*Room{{curr}}
+    }
+
+    visited[curr] = true
+    var allPaths [][]*Room
+
+    for _, neighbor := range curr.links {
+        if !visited[neighbor] {
+            neighborPaths := dfsHelperAll(neighbor, end, visited)
+            for _, path := range neighborPaths {
+                allPaths = append(allPaths, append([]*Room{curr}, path...))
+            }
+        }
+    }
+
+    visited[curr] = false
+    return allPaths
 }
