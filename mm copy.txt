@@ -1,80 +1,103 @@
-package main
+package lemin
 
 import (
 	"fmt"
-	"log"
-	"os"
+	"sort"
 	"strconv"
-	"strings"
 )
 
-type Room struct {
-	name  string
-	links []*Room
+type Ants struct {
+	Name  string
+	Path  *[]Vertex
+	Index int
 }
 
-func main() {
-	file, err := os.ReadFile(os.Args[1])
-	if err != nil {
-		log.Fatal("Error opening file:", err)
-	}
-	ting := strings.Split(string(file), "\n")
+func QueueThem(NumAnts int, MaxFlow [][]Vertex) [][]string {
 
-	antnum, err := strconv.Atoi(ting[0])
-	if err != nil {
-		log.Fatal("Invalid num of ants")
-	}
-	fmt.Println(antnum)
+	//Sort them from shortest to longest
+	sort.Slice(MaxFlow, func(i, j int) bool { return len(MaxFlow[j]) > len(MaxFlow[i]) })
 
-	rooms := make(map[string]*Room)
+	//start queuing them using edmonds-karp
+	QueuedAnts := make([][]string, len(MaxFlow))
 
-	var start, end *Room
-	var name string
-
-	for i, line := range ting {
-		if strings.HasPrefix(line, "##start") {
-			name := strings.Fields(ting[i+1])
-			start = &Room{name: name[0]}
-			continue
+	//here, we are adding all ants to the only path we have
+	//hence why len(MaxFlow) would be 1
+	if len(MaxFlow) == 1 {
+		for i := 1; i <= NumAnts; i++ {
+			AntName := "L"
+			QueuedAnts[0] = append(QueuedAnts[0], AntName)
 		}
+	} else {
+		for i := 1; i <= NumAnts; i++ {
+			AntName := "L"
+			//after adding an ant to the queue
+			//we need to decide which path does it
+			//correspond to
+			for j := 0; j < len(MaxFlow); j++ {
+				if j < len(MaxFlow)-1 {
+					PathSize1 := len(MaxFlow[j]) + len(QueuedAnts[j])
+					PathSize2 := len(MaxFlow[j+1]) + len(QueuedAnts[j+1])
+					if PathSize1 <= PathSize2 {
+						QueuedAnts[j] = append(QueuedAnts[j], AntName)
+						break
+					}
+				} else if j == len(MaxFlow)-1 {
+					QueuedAnts[j] = append(QueuedAnts[j], AntName)
+				}
 
-		if strings.HasPrefix(line, "##end") {
-			name := strings.Fields(ting[i+1])
-			end = &Room{name: name[0]}
-			continue
-		}
-		if strings.HasPrefix(line, "#") || i == 0 || len(line) == 0 || line[0] == 'L' {
-			continue
-		}
-
-		if len(strings.Fields(line)) == 3 {
-			name = strings.Fields(line)[0]
-			rooms[name] = &Room{name: name}
-		} else {
-			rooms[]
+			}
 		}
 
 	}
-	// for start!=nil{
-	fmt.Println(start.links)
-	// }
 
-	// fmt.Println(rooms[name].links)
-	// fmt.Println(start)
-	fmt.Println(end.links == nil)
-	fmt.Println(start.links == nil)
-	// fmt.Println(rooms)
+	//Name the ants properly
+	counter := 1
+	PathLengthCount := 0
+	for counter <= NumAnts {
+		for _, v := range QueuedAnts {
+			if len(v)-1 < PathLengthCount {
+				continue
+			}
+			v[PathLengthCount] += strconv.Itoa(counter)
+			counter++
+		}
+		PathLengthCount++
+	}
+	return QueuedAnts
+
 }
-func (r *Room) addLink(line string, rooms map[string]*Room) {
-	path := strings.Split(line, "-")
-	
-    if rooms[path[0]].name == path[0] {
-        r.links = append(r.links, rooms[path[1]])
-    }
-}
-func Addlink(line string, rooms map[string]*Room) {
-	path := strings.Split(line, "-")
-	if rooms[path[0]].name == path[0] {
-		rooms[path[0]].links = append(rooms[path[0]].links, rooms[path[1]])
+
+func PrintResult(QueuedAnts [][]string, MaxFlow [][]Vertex, NumAnts int) {
+
+	var ants []Ants
+
+	var queueCount = len(QueuedAnts)
+	var completedQueueCount int = 0
+
+	for i := 0; NumAnts > 0; i++ {
+		for j, v := range QueuedAnts {
+			if i > len(v)-1 {
+				completedQueueCount++
+				if completedQueueCount >= queueCount {
+					break
+				}
+			} else {
+				ants = append(ants, Ants{Name: v[i], Path: &MaxFlow[j], Index: 1})
+			}
+		}
+
+		for i, ant := range ants {
+			if ant.Index < len(*ant.Path) {
+				vertex := *ant.Path
+				fmt.Printf("%s-%s ", ant.Name, vertex[ant.Index].Name)
+				ant.Index++
+				if ant.Index >= len(vertex) {
+					NumAnts--
+				}
+				ants[i] = ant
+			}
+		}
+		fmt.Println()
 	}
+
 }
