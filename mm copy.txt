@@ -100,4 +100,42 @@ func PrintResult(QueuedAnts [][]string, MaxFlow [][]Vertex, NumAnts int) {
 		fmt.Println()
 	}
 
-}
+}// func refine(all [][]*Room, maps map[int][]int) [][]*Room {
+// 	var paths [][]*Room
+// 	for i := 0; i < len(maps); i++ {
+// 		paths = append(paths, all[i])
+// 	}
+// 	return paths
+// }
+
+// func sing(allPaths [][]*Room, ants []int) map[int][]int {
+// 	assign := make(map[int][]int)
+// 	done := make(map[int]bool)
+// 	for i := 0; i <= len(allPaths); i++ {
+// 		for j := 0; j < len(ants); j++ {
+// 			if i < len(allPaths)-1 {
+// 				if len(assign[i])+len(allPaths[i]) <= len(allPaths[i+1]) && !done[ants[j]] {
+// 					assign[i] = append(assign[i], ants[j])
+// 					done[ants[j]] = true
+// 				}
+// 			}
+// 			if i == len(allPaths)-1 {
+// 				assign[i] = append(assign[i], ants[j])
+// 			}
+
+// 		}
+// 	}
+// 	return assign
+// }
+
+// assign[7] = append(assign[7], 4)
+// fmt.Println(len(assign[7]))
+// done := make(map[int]bool)
+// for i := 1; i <= len(allPaths); i++ {
+// 	for j := 0; j < len(ants); j++ {
+// 		if len(assign[i]) <= len(assign[i+1]) &&!done[ants[j]] {
+// 			assign[i] = append(assign[i], ants[j])
+// 			done[ants[j]]=true
+// 		}
+// 	}
+// }
