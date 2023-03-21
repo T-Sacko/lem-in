@@ -27,7 +27,7 @@ func main() {
 	if err != nil {
 		log.Fatal("Invalid num of ants")
 	}
-	fmt.Println("number of ants:", antnum)
+	//fmt.Println("number of ants:", antnum)
 	// make map for rooms
 	Rooms := make(map[string]*Room)
 	var start, end *Room
@@ -67,7 +67,7 @@ func main() {
 			if strings.Contains(line, "-") {
 				path = strings.Split(line, "-")
 				if Rooms[path[0]] == nil || Rooms[path[1]] == nil {
-					fmt.Println(i)
+				//	fmt.Println(i)
 					log.Fatalf("Error, either room %s or room %s aint a room", path[0], path[1])
 				}
 
@@ -92,6 +92,7 @@ func main() {
 
 		}
 	}
+
 
 	allPaths, err := DFSAll(start, end)
 	if err != nil {
@@ -120,18 +121,19 @@ func main() {
 	queued := QueueThem(antnum, maxflow)
 	// fmt.Println()
 	sortByLength(maxflow)
-	fmt.Println()
-	tinge := CombinePaths(allPaths)
-	for i := 0; i < len(tinge); i++ {
-		for j := 0; j < len(tinge[i]); j++ {
-			for k := 1; k < len(tinge[i][j]); k++ {
-				fmt.Print(tinge[i][j][k].name, ",  ")
-			}
-			fmt.Println("\n")
-		}
-		fmt.Println("next,\n")
-	}
+//	fmt.Println()
+	// tinge := CombinePaths(allPaths)
+	// for i := 0; i < len(tinge); i++ {
+	// 	for j := 0; j < len(tinge[i]); j++ {
+	// 		for k := 1; k < len(tinge[i][j]); k++ {
+	// 			fmt.Print(tinge[i][j][k].name, ",  ")
+	// 		}
+	// 		fmt.Println("\n")
+	// 	}
+	// 	fmt.Println("next,\n")
+	// }
 	QueueThem(antnum, maxflow)
+	fmt.Println(string(file),"\n")
 	PrintResult(queued, maxflow, antnum)
 }
 
