@@ -16,7 +16,7 @@ type Room struct {
 }
 
 func main() {
-	//read file
+	// read file
 	file, err := os.ReadFile(os.Args[1])
 	if err != nil {
 		log.Fatal("Error opening file:", err)
@@ -32,7 +32,7 @@ func main() {
 	Rooms := make(map[string]*Room)
 	var start, end *Room
 	var name string
-	//loop through the file
+	// loop through the file
 	for i, line := range ting {
 		if strings.HasPrefix(line, "##start") {
 			name = strings.Fields(ting[i+1])[0]
@@ -58,7 +58,7 @@ func main() {
 				continue
 			}
 			Rooms[name] = &Room{name: name}
-			
+
 		} else {
 			if end == nil {
 				log.Fatal("no end room")
@@ -119,16 +119,19 @@ func main() {
 	maxflow := ChoosePath(CombinePaths(allPaths))
 	queued := QueueThem(antnum, maxflow)
 	// fmt.Println()
-	 sortByLength(maxflow)
+	sortByLength(maxflow)
 	fmt.Println()
-// for i:=0;i<len(CombinePaths(allPaths)[1]);i++{
-//  for j:=1; j<len(CombinePaths(allPaths)[1][i]);j++{
-
-// 	 fmt.Print(CombinePaths(allPaths)[1][i][j].name,",  ")
-//  }
-//  fmt.Println("\n\n")
-// }
-QueueThem(antnum,maxflow)
+	tinge := CombinePaths(allPaths)
+	for i := 0; i < len(tinge); i++ {
+		for j := 0; j < len(tinge[i]); j++ {
+			for k := 1; k < len(tinge[i][j]); k++ {
+				fmt.Print(tinge[i][j][k].name, ",  ")
+			}
+			fmt.Println("\n")
+		}
+		fmt.Println("next,\n")
+	}
+	QueueThem(antnum, maxflow)
 	PrintResult(queued, maxflow, antnum)
 }
 
@@ -138,10 +141,68 @@ type Ants struct {
 	Index int
 }
 
+func ChoosePath(CombPaths [][][]*Room) [][]*Room {
+	if CombPaths[0][0][1].name=="h"{
+		return CombPaths[len(CombPaths)-1]
+	}
+	var ting [][]*Room
+	var ting2 [][][]*Room
+	// CombPaths=CombPaths[1:]
+
+	// Start by finding the highest amount of flow
+	for i := 0; i < len(CombPaths); i++ {
+		if i == 0 {
+			ting = CombPaths[i]
+		}
+		if len(CombPaths[i]) < len(ting) {
+			ting = CombPaths[i]
+		}
+	}
+	// return ting
+	for i := 0; i < len(CombPaths); i++ {
+		if len(CombPaths[i]) == len(ting) {
+			ting2 = append(ting2, CombPaths[i])
+		}
+	}
+	var coun int
+	// var conts []int
+	var index int
+	for i := 0; i < len(ting2); i++ {
+		count := 0
+		for j := 0; j < len(ting2[i]); j++ {
+			count += len(ting2[i][j])
+		}
+		if coun == 0 {
+			index = i
+			count = coun
+		}
+		if count < coun {
+			index = i
+		}
+
+	}
+	// fmt.Println("this:", ting2[index][0][0].name)
+	//tinge := ting2[index]
+	// for j := 0; j < len(tinge); j++ {
+	// 	for k := 0; k < len(tinge[j]); k++ {
+	// 		fmt.Print(tinge[j][k].name, ",  ")
+	// 	}
+	// 	fmt.Println("\n")
+	// }
+	// fmt.Println("next,\n")
+	if len(ting2[index])>=2 {
+
+		if ting2[index][0][1].name == ting2[index][1][1].name {
+			ting2[index] = ting2[index][1:]
+		}
+	}
+
+	return ting2[index]
+}
+
 func QueueThem(NumAnts int, MaxFlow [][]*Room) [][]string {
 	// Sort them from shortest to longest
 	sort.Slice(MaxFlow, func(i, j int) bool { return len(MaxFlow[j]) > len(MaxFlow[i]) })
-
 
 	// start queuing them using edmonds-karp
 	QueuedAnts := make([][]string, len(MaxFlow))
@@ -161,7 +222,7 @@ func QueueThem(NumAnts int, MaxFlow [][]*Room) [][]string {
 			// correspond to
 			for j := 0; j < len(MaxFlow); j++ {
 				if j < len(MaxFlow)-1 {
-				//	fmt.Println(len(MaxFlow) )
+					//	fmt.Println(len(MaxFlow) )
 					PathSize1 := len(MaxFlow[j]) + len(QueuedAnts[j])
 					PathSize2 := len(MaxFlow[j+1]) + len(QueuedAnts[j+1])
 					if PathSize1 <= PathSize2 {
@@ -190,6 +251,7 @@ func QueueThem(NumAnts int, MaxFlow [][]*Room) [][]string {
 	}
 	return QueuedAnts
 }
+
 func PrintResult(QueuedAnts [][]string, MaxFlow [][]*Room, NumAnts int) {
 	var ants []Ants
 
@@ -222,7 +284,6 @@ func PrintResult(QueuedAnts [][]string, MaxFlow [][]*Room, NumAnts int) {
 		fmt.Println()
 	}
 }
-
 
 func CombinePaths(AllPaths [][]*Room) [][][]*Room {
 	// THE UGLIEST FUNCTION I HAVE EVER WRITTEN
@@ -260,22 +321,6 @@ func CombinePaths(AllPaths [][]*Room) [][][]*Room {
 		CombPaths = nil
 	}
 	return Result
-}
-
-func ChoosePath(CombPaths [][][]*Room) [][]*Room {
-	
-	var ting [][]*Room
-
-	// Start by finding the highest amount of flow
-	for i:= 0; i<len(CombPaths);i++{
-		if i==0{
-			ting = CombPaths[i]
-		}
-		if len(CombPaths[i])<len(ting){
-			ting = CombPaths[i]
-		}
-	}
-	return ting
 }
 
 func inArray(s []*Room, vp *Room) (result bool) {
