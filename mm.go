@@ -26,6 +26,10 @@ func main() {
 	antnum, err := strconv.Atoi(ting[0])
 	if err != nil {
 		log.Fatal("Invalid num of ants")
+		
+	}
+	if antnum <= 0 {
+		log.Fatal("Error, invalid num of ants")
 	}
 	//fmt.Println("number of ants:", antnum)
 	// make map for rooms
@@ -83,7 +87,7 @@ func main() {
 					Curr := Rooms[path[0]].name
 					neighbour := Rooms[path[1]].name
 					if Curr == neighbour {
-						log.Fatalf("Room %s links to itself", Curr)
+						log.Fatalf("Error, Room %s links to itself", Curr)
 					}
 					Rooms[path[0]].links = append(Rooms[path[0]].links, Rooms[path[1]])
 					Rooms[path[1]].links = append(Rooms[path[1]].links, Rooms[path[0]])
@@ -133,7 +137,8 @@ func main() {
 	// 	fmt.Println("next,\n")
 	// }
 	QueueThem(antnum, maxflow)
-	fmt.Println(string(file),"\n")
+	fmt.Println(string(file))
+	fmt.Println()
 	PrintResult(queued, maxflow, antnum)
 }
 
